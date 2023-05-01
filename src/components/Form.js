@@ -1,17 +1,27 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { DevTool } from "@hookform/devtools";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const schema = yup.object({
+  name: yup.string().required("name is required"),
+  age: yup.date().required("age is required"),
+  sex: yup.string().required("sex is required"),
+  email: yup.string().email("email format is not valid"),
+});
 
 function Form() {
-  const form = useForm();
-  const { register, control, handleSubmit } = form;
+  const form = useForm({ resolver: yupResolver(schema) });
+  const { register, control, handleSubmit, formState } = form;
+  const { errors } = formState;
 
   const onSubmit = (data) => {
     console.log("form submitted", data);
   };
   return (
     <div className="formContainer">
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <h3>Personal Details:</h3>
         <label htmlFor="name">Name</label>
         <input
@@ -211,8 +221,12 @@ function Form() {
           id="nationality"
           {...register("nationality")}
         />
+        <br />
         <button>SUBMIT</button>
       </form>
+      <p className="errors">{errors.name?.message}</p>
+      <p className="errors">{errors.age?.message}</p>
+      <p className="errors">{errors.sex?.message}</p>
 
       <DevTool control={control} />
       <br />
